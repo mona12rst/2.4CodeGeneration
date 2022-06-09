@@ -32,18 +32,18 @@ public class RoleService {
         roleRepository.save(new Role(3,"Bank"));
     }
 
-    public String assignRole(int userId, String role) {
-        User user = userService.findUserById(userId).orElse(null);
-        Role newRoles = roleRepository.findByName(role).orElse(null);
-        if (user != null && newRoles != null) {
-            Collection<Role> oldRole = user.getRoles();
-            oldRole.add(newRoles);
-            user.setRoles(oldRole);
-            userService.saveUser(user);
-            return "Done";
-        }
-        return "Check your provided Details twice";
-    }
+//    public String assignRole(int userId, String role) {
+//        User user = userService.findUserById(userId).orElse(null);
+//        Role newRoles = roleRepository.findByName(role).orElse(null);
+//        if (user != null && newRoles != null) {
+//            Collection<Role> oldRole = user.getRoles();
+//            oldRole.add(newRoles);
+//            user.setRoles(oldRole);
+//            userService.saveUser(user);
+//            return "Done";
+//        }
+//        return "Check your provided Details twice";
+//    }
 
 //    public String removeRole(int userId, UserRoleEnum role) {
 //

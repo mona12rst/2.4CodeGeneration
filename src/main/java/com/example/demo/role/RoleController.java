@@ -13,6 +13,7 @@ public class RoleController {
 
     @PostMapping("/role/{role}/{userid}")
     public String assignRole(@PathVariable("role") String role, @PathVariable("userid") int userid) {
-        return roleService.assignRole(userid, role);
+//        return roleService.assignRole(userid, role);
+        return "done";
     }
 }
