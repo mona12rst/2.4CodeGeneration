@@ -29,6 +29,10 @@ public enum AccountTypeEnum {
         return null;
     }
 
+    public String getValue(){
+        return this.value;
+    }
+
     @Override
     @JsonValue
     public String toString()
