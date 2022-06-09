@@ -5,6 +5,7 @@ import com.example.demo.accounts.AccountRepository;
 import com.example.demo.enums.AccountStatusEnum;
 import com.example.demo.enums.AccountTypeEnum;
 import com.example.demo.enums.UserRoleEnum;
+import com.example.demo.enums.UserStatusEnum;
 import com.example.demo.role.Role;
 import com.example.demo.role.RoleRepository;
 import com.example.demo.user.User;
@@ -20,9 +21,8 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.LocalDate;
+import java.util.*;
 
 @SpringBootApplication
 public class DemoApplication {
@@ -43,16 +43,20 @@ public class DemoApplication {
     public void init() {
 
 
-        roleRepository.save(new Role(0,"Bank"));
 
-        Role adminRole = roleRepository.findByName("Bank").orElse(null);
+        Account bankAccount = Account.builder().IBANNo("NL01INHO0000000001").accountType(AccountTypeEnum.CURRENT)
+                .balance(0).dateOfOpening("").accountStatus(AccountStatusEnum.ACTIVE).build();
 
-        userRepository.save(new User(0, "Bank@g.com", "2265", "Bank", "Mona",
-                "00-00-00", "bankpass", Arrays.asList(adminRole)));
+        accountRepository.save(bankAccount);
 
-        accountRepository.save(new Account(0, "NL01INHO0000000001", AccountTypeEnum.CURRENT, 0,
-                "", AccountStatusEnum.ACTIVE, 0, 100000000, 10000000, 0));
+        User bankUser = User.builder().userName("Bank@g.com").mobileNumber("2266")
+                .firstName("Bank").lastName("Mona").DateOfBirth("00-00-00").password("bankpass")
+                .roles(String.valueOf(UserRoleEnum.ROLE_BANK)).accounts(Collections.singleton(bankAccount))
+                .status(UserStatusEnum.ACTIVE).build();
+
+        userRepository.save(bankUser);
     }
+
 
 
 }
