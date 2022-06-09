@@ -1,6 +1,7 @@
 package com.example.demo.accounts;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,36 +16,46 @@ public class AccountController {
 
 
     @GetMapping("/accounts")
+    @PreAuthorize("hasAnyRole('ROLE_BANK','ROLE_EMPLOYEE')")
     public List<Account> fetchAllAccounts() {
         return accountService.getAllAccounts();
     }
 
-    @GetMapping("/account/{id}")
+    @GetMapping("/accounts/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_BANK','ROLE_EMPLOYEE')")
     public Optional<Account> getUserById(@PathVariable("id") int id) {
         return accountService.findAccountById(id);
     }
 
 
-    @PostMapping("/account/{userid}")
+    @PostMapping("/accounts/{userid}")
+    @PreAuthorize("hasAnyRole('ROLE_BANK','ROLE_EMPLOYEE')")
     public String createAccount(@PathVariable("userid") int userid, @RequestBody Account account) {
         return accountService.AddAccount(userid, account);
     }
 
-    @PutMapping("/account/{id}")
-    public String updateUser(@PathVariable int id, @RequestBody Account account) {
+    @PutMapping("/accounts/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_BANK','ROLE_EMPLOYEE')")
+    public String updateAccount(@PathVariable int id, @RequestBody Account account) {
         return accountService.updateAccount(id, account);
     }
 
-
-    @DeleteMapping("/account/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
+    // only deactivates, doesnt delete really
+    @DeleteMapping("/accounts/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_BANK','ROLE_EMPLOYEE')")
+    public String deleteAccount(@PathVariable("id") int id) {
         return accountService.deleteAccount(id);
     }
 
 
-    @GetMapping("/findiban/{id}")
-    public String findIbanById(@PathVariable("id") int id) {
-        return accountService.findIbanByUserId(id);
+    @GetMapping("/findiban/{firstName}")
+    public String findIbanByUserName(@PathVariable("firstName") String firstName) {
+        return accountService.findIbanByUserName(firstName);
+    }
+
+    @GetMapping("balance/{IBAN}")
+    public String balanceCheck( @RequestHeader("Authorization") String token,@PathVariable("IBAN") String IBAN) {
+        return accountService.balanceCheck(token,IBAN);
     }
 
 
