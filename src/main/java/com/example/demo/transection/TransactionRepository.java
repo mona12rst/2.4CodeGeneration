@@ -12,7 +12,7 @@ public interface TransactionRepository extends JpaRepository<Transaction,Integer
 
     List<Transaction> findAllByFromIban(String value);
 
-    Optional<Transaction> findByDateOfTransactionBetween(LocalDate to, LocalDate from);
+    List<Transaction> findByFromIbanAndDateOfTransactionBetween(String Iban, LocalDate to, LocalDate from);
 
     List<Transaction> findAllByToIban(String integer);
 
@@ -25,4 +25,6 @@ public interface TransactionRepository extends JpaRepository<Transaction,Integer
     List<Transaction> findAllByTransferAmountGreaterThan(long integer);
 
     List<Transaction> findAllByTransferAmountIsGreaterThanEqual(long integer);
+
+    List<Transaction> findAllByDateOfTransaction(LocalDate integer);
 }

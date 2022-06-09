@@ -1,7 +1,9 @@
 package com.example.demo.transection;
 
+import com.example.demo.utils.JwtUtil;
 import lombok.AllArgsConstructor;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -9,76 +11,89 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/transactions/")
 public class TransactionController {
 
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
+    private final JwtUtil jwtUtil;
 
-    @PostMapping("/transaction")
-    public String addTransaction(@RequestBody Transaction transaction) {
-        return transactionService.saveTransaction(transaction);
+    @PostMapping
+    //Employee should be able to do transaction from any account
+    @PreAuthorize("hasAnyRole('ROLE_CUSTOMER','ROLE_EMPLOYEE')")
+    public String makeTransaction(@RequestBody TransactionDTO transaction, @RequestHeader("Authorization") String token) {
+        String username = jwtUtil.extractUsername(token.substring(7));
+        return transactionService.makeTransaction(transaction, username);
     }
 
-    @GetMapping("/transactions")
-    public List<Transaction> getAlltransaction() {
-        return transactionService.getAllTransaction();
+//    @GetMapping("/transactions")
+//    @PreAuthorize("hasAnyRole('ROLE_BANK','ROLE_EMPLOYEE')")
+//    public List<Transaction> getAlltransaction() {
+//        return transactionService.getAllTransaction();
+//    }
+
+//    @PutMapping("/transaction")
+//    @PreAuthorize("hasAnyRole('ROLE_SPECIAL')")
+//    public String updatetransaction(@RequestBody Transaction transaction) {
+//        return transactionService.updateTransaction(transaction);
+//    }
+
+    @GetMapping("{IBAN}")
+    public List<Transaction> gettransactionByIBAN(@PathVariable("IBAN") String IBAN, @RequestHeader("Authorization") String token) {
+        return transactionService.findTransactionByIban(IBAN, token);
     }
 
-    @PutMapping("/transaction")
-    public String updatetransaction(@RequestBody Transaction transaction) {
-        return transactionService.updateTransaction(transaction);
-    }
-
-    @GetMapping("/transaction/{iban}")
-    public List<Transaction> gettransactionById(@PathVariable("iban") String iban) {
-        return transactionService.findTransactionByIban(iban);
-    }
-
-    @DeleteMapping("/transaction/{id}")
-    public String deletetransaction(@PathVariable("id") int id) {
-        return transactionService.deleteTransaction(id);
-    }
+//    @DeleteMapping("{id}")
+//    public String deletetransaction(@PathVariable("id") int id) {
+//        return transactionService.deleteTransaction(id);
+//    }
 
 
-    @GetMapping("/transaction/betweenDates/{to}/{from}")
-    public Transaction findTransactionsBetween(@PathVariable("to") LocalDate to, @PathVariable("from") LocalDate from) {
-        return transactionService.findTransactionsBetween(to, from);
+    @GetMapping("{IBAN}/betweenDates/{to}/{from}")
+    public List<Transaction> findByFromIBANAndDateOfTransactionBetween(@PathVariable("IBAN") String IBAN, @PathVariable("to") String to, @PathVariable("from") String from, @RequestHeader("Authorization") String token) {
+        return transactionService.findByFromIbanAndDateOfTransactionBetween(IBAN, to, from, token);
     }
 
-    @GetMapping("/transaction/FromIban/{iban}")
-    public List<Transaction> findFromIban(@PathVariable("iban") String iban) {
-        return transactionService.findFromIban(iban);
+//    @GetMapping("{IBAN}/fromIBAN")
+//    public List<Transaction> findFromIBAN(@PathVariable("IBAN") String IBAN,@RequestHeader("Authorization") String token) {
+//        return transactionService.findFromIban(IBAN,token);
+//    }
+
+    @GetMapping("{IBAN}/toIBAN/{receiverIBAN}")
+    public List<Transaction> findToIBAN(@PathVariable("IBAN") String IBAN, @RequestHeader("Authorization") String token, @RequestParam("receiverIBAN") String reciverIban) {
+        return transactionService.findToIban(IBAN, token, reciverIban);
     }
 
-    @GetMapping("/transaction/ToIban/{iban}")
-    public List<Transaction> findToIban(@PathVariable("iban") String iban) {
-        return transactionService.findToIban(iban);
+    @GetMapping("{IBAN}/amountEqual/{amount}")
+    public List<Transaction> transferAmountEquals(@PathVariable("IBAN") String IBAN, @PathVariable("amount") long amount, @RequestHeader("Authorization") String token) {
+        return transactionService.transferAmountEquals(IBAN, amount, token);
     }
 
-    @GetMapping("/transaction/amountEqual/{amount}")
-    public List<Transaction> transferAmountEquals(@PathVariable("amount") long amount) {
-        return transactionService.transferAmountEquals(amount);
+    @GetMapping("{IBAN}/amountLess/{amount}")
+    public List<Transaction> transferAmountLess(@PathVariable("IBAN") String IBAN, @PathVariable("amount") long amount, @RequestHeader("Authorization") String token) {
+        return transactionService.transferAmountLess(IBAN, amount, token);
     }
 
-    @GetMapping("/transaction/amountLess/{amount}")
-    public List<Transaction> transferAmountLess(@PathVariable("amount") long amount) {
-        return transactionService.transferAmountLess(amount);
+    @GetMapping("{IBAN}/amountLessEqual/{amount}")
+    public List<Transaction> transferAmountLessAndEqual(@PathVariable("IBAN") String IBAN, @PathVariable("amount") long amount, @RequestHeader("Authorization") String token) {
+        return transactionService.transferAmountLessAndEqual(IBAN, amount, token);
     }
 
-    @GetMapping("/transaction/amountLessEqual/{amount}")
-    public List<Transaction> transferAmountLessAndEqual(@PathVariable("amount") long amount) {
-        return transactionService.transferAmountLessAndEqual(amount);
+    @GetMapping("{IBAN}/amountGrater/{amount}")
+    public List<Transaction> transferAmountGrater(@PathVariable("IBAN") String IBAN, @PathVariable("amount") long amount, @RequestHeader("Authorization") String token) {
+        return transactionService.transferAmountGrater(IBAN, amount, token);
     }
 
-    @GetMapping("/transaction/amountGrater/{amount}")
-    public List<Transaction> transferAmountGrater(@PathVariable("amount") long amount) {
-        return transactionService.transferAmountGrater(amount);
+    @GetMapping("{IBAN}/amountGraterEqual/{amount}")
+    public List<Transaction> transferAmountGraterAndEqual(@PathVariable("IBAN") String IBAN, @PathVariable("amount") long amount, @RequestHeader("Authorization") String token) {
+        return transactionService.transferAmountGraterAndEqual(IBAN, amount, token);
     }
 
-    @GetMapping("/transaction/amountGraterEqual/{amount}")
-    public List<Transaction> transferAmountGraterAndEqual(@PathVariable("amount") long amount) {
-        return transactionService.transferAmountGraterAndEqual(amount);
+    @PostMapping("deposit/{IBAN}/{Amount}")
+    public String depoistAmount(@PathVariable("IBAN") String IBAN, @PathVariable("Amount") long Amount, @RequestHeader("Authorization") String token) {
+        return transactionService.depoistMoney(IBAN, Amount, token);
     }
+
+
 
 
 }
